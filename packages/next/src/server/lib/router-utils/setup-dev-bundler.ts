@@ -128,6 +128,7 @@ import { denormalizePagePath } from '../../../shared/lib/page-path/denormalize-p
 import type { LoadableManifest } from '../../load-components'
 import { generateRandomActionKeyRaw } from '../../app-render/action-encryption-utils'
 import { bold, green, red } from '../../../lib/picocolors'
+import { writeFileAtomic } from '../../../lib/fs/write-atomic'
 
 const wsServer = new ws.Server({ noServer: true })
 
@@ -810,24 +811,6 @@ async function startWatcher(opts: SetupOpts) {
         Object.assign(manifest, m)
       }
       return manifest
-    }
-
-    async function writeFileAtomic(
-      filePath: string,
-      content: string
-    ): Promise<void> {
-      const tempPath = filePath + '.tmp.' + Math.random().toString(36).slice(2)
-      try {
-        await writeFile(tempPath, content, 'utf-8')
-        await rename(tempPath, filePath)
-      } catch (e) {
-        try {
-          await unlink(tempPath)
-        } catch {
-          // ignore
-        }
-        throw e
-      }
     }
 
     async function writeBuildManifest(
